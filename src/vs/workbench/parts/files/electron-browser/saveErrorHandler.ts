@@ -157,10 +157,26 @@ export class SaveErrorHandler implements ISaveErrorHandler, IWorkbenchContributi
 				}));
 			}
 
+			// Reopen as admin
+			if (error.errno === -4048)	{
+				actions.push(new Action('workbench.files.action.reOpenAsAdmin', nls.localize('reOpenAsAdmin', "Reopen as admin"), null, true, () => {
+					const reOpenAsAdminAction = this.instantiationService.createInstance(ReOpenAsAdminAction, null, null, "some label");
+					reOpenAsAdminAction.setResource(resource);
+					reOpenAsAdminAction.run().done(() => reOpenAsAdminAction.dispose(), errors.onUnexpectedError);
+
+					return TPromise.as(true);
+				}));
+			}
+
 			// Cancel
 			actions.push(CancelAction);
 
+
+
+
 			let errorMessage: string;
+
+
 			if (isReadonly) {
 				errorMessage = nls.localize('readonlySaveError', "Failed to save '{0}': File is write protected. Select 'Overwrite' to remove protection.", paths.basename(resource.fsPath));
 			} else {
